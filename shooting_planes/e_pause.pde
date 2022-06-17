@@ -1,4 +1,5 @@
 void pause(){
+  theme.pause();
   fill(0,255,0);
 }
 

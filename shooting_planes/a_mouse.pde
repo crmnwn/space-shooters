@@ -11,8 +11,8 @@ void mouseReleased() {
 }
 void tactile(int x, int y, int w, int h) {
   if (mouseX < x+w && mouseX > x && mouseY < y+h && mouseY > y) {
-    //stroke(purple);
+    stroke(green);
   } else {
-    //stroke(darkpurple);
+    stroke(purple);
   }
 }

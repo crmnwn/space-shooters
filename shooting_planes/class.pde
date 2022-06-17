@@ -15,7 +15,8 @@ class Plane extends GameObject{
   int cd, th;
   Plane() {
     super(400,400,0,0,50,#FFFFFF,3);
-    th=20;
+    image(p1,x,y,50,50);
+    th=50;
     cd=th;
   }
   void act(){
@@ -23,35 +24,93 @@ class Plane extends GameObject{
     //managing guns
     cd++;
     if(space&&cd>=th) {
-      objects.add(new Bullet());
+      objects.add(new Bullet(0,-10));
       cd=0;
-    }
+      if (op==true) objects.add(new Bullet(0,10));
+      if (opp==true) {
+        objects.add(new Bullet(-10,0));
+        objects.add(new Bullet(10,0));
+      }
+    } 
+      
     //collisions
+    //powerups
     int i=0;
-    while (i<objects.size()){
+    while (i<objects.size()){ 
       GameObject obj=objects.get(i);
-    if (obj instanceof EnemyBullet) {
+      if (obj instanceof Powerups) {
+        if (collidingWith(obj)) {
+          if (th>20) th--;
+          if (th==20 && score>100 && score<200) op=true;
+          if (th==20 && score>200) opp=true;  
+          obj.hp=0;
+        }
+      }
+      //enemy bullet
+      if (obj instanceof EnemyBullet) {
         if (collidingWith(obj)) {
           hp--;
+          bump.rewind();
+          bump.play();
+          //screen flash red
+            noFill();
+            strokeWeight(75);
+            stroke(red);
+            rect(400,400,750,750,50);
+          //particles
+            int m=0;
+            while(m<30) {
+              objects.add(new Particles(x,y,0,0,c));
+              m++;
+            }
+          obj.hp=0;
         }
-        i++;
+        }
+      //asteroid
+      if (obj instanceof Rock) {
+        if(collidingWith(obj)) {
+          hp--;
+          bump.rewind();
+          bump.play();
+          //screen flash red
+            noFill();
+            strokeWeight(75);
+            stroke(red);
+            rect(400,400,750,750,50);
+          //particles
+            int m=0;
+            while(m<30) {
+              objects.add(new Particles(x,y,0,0,c));
+              m++;
+            }
+            m=0;
+          obj.hp=0;
+        }
       }
+      i++;
     }
     //moving
-    if(left==true) x=x-5;
-    if(right==true) x=x+5;
-    if(up==true) y=y-5;
-    if(down==true) y=y+5;
+    if(x<size/2) x=size/2;
+    if(x>width-size/2) x=width-size/2;
+    if(y<size/2) y=size/2;
+    if(y>height-size/2) y=height-size/2;
+    if(left==true) x=x-4;
+    if(right==true) x=x+4;
+    if(up==true) y=y-4;
+    if(down==true) y=y+4;
     //decelerate
     if(!up && !down) vy=vy*0.9;
     if(!right && !left) vx=vx*0.9;
+  }
+  void show() {
+    image(p1, player1.x, player1.y, 50,50);
   }
     
 }
 
 class Bullet extends GameObject{
-  Bullet(){
-    super(player1.x, player1.y, 0, -10, 10, red, 1);
+  Bullet(float vx, float vy){
+    super(player1.x, player1.y, vx, vy, 10, yellow, 1);
   }
   void act(){
     super.act();
